@@ -50,7 +50,7 @@ export default function createInteractions(client: BotClient) {
         const randomIndex = Math.floor(Math.random() * items.length);
         const selected = items.splice(randomIndex, 1)[0];
         await interaction.reply(
-          `🎡 **The Wheel has spoken.**. The chosen one is: **${selected}**.\nRemaining: ${
+          `🎡 **The Wheel has spoken.**\n The chosen one is: **${selected}**.\nRemaining: ${
             items.length > 0 ? items.join(", ") : "None left!"
           }`
         );
