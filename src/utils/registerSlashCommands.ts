@@ -1,43 +1,55 @@
 import { REST, Routes, SlashCommandBuilder } from "discord.js";
+import { Commands } from "../constants";
 
 /**
- * Registers or updates Discord slash commands for the bot.
- *
- * @function
- * @returns A Promise that resolves when the commands are successfully registered or updated.
+ * Registers and updates Discord slash commands for the bot.
  */
 export default async function registerSlashCommands() {
   const commands = [
     new SlashCommandBuilder()
-      .setName("add")
+      .setName(Commands.Add)
       .setDescription("Add one or more items to the wheel (space-separated)")
       .addStringOption((option) =>
         option
           .setName("items")
-          .setDescription(
-            "Items to add, separated by spaces (e.g. Alice Bob Charlie)"
-          )
+          .setDescription("Items to add (separate with spaces)")
           .setRequired(true)
       ),
 
     new SlashCommandBuilder()
-      .setName("list")
+      .setName(Commands.List)
       .setDescription("Show all current items"),
 
     new SlashCommandBuilder()
-      .setName("spin")
+      .setName(Commands.Spin)
       .setDescription("Spin the wheel and remove the selected item"),
 
     new SlashCommandBuilder()
-      .setName("reset")
+      .setName(Commands.Reset)
       .setDescription("Reset the wheel"),
+
+    new SlashCommandBuilder()
+      .setName(Commands.Remove)
+      .setDescription("Remove an item from the wheel by name.")
+      .addStringOption((option) =>
+        option
+          .setName("item")
+          .setDescription("The name of the item you want to remove.")
+          .setRequired(true)
+      ),
+
+    new SlashCommandBuilder()
+      .setName(Commands.Shuffle)
+      .setDescription("Shuffle all items in the wheel randomly."),
   ].map((command) => command.toJSON());
 
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
   (async () => {
     try {
-      console.log("⏳ Refreshing application (/) commands...");
+      console.log(
+        `⏳ Refreshing ${commands.length} application (/) commands...`
+      );
 
       await rest.put(
         Routes.applicationGuildCommands(
@@ -47,7 +59,9 @@ export default async function registerSlashCommands() {
         { body: commands }
       );
 
-      console.log("✅ Successfully registered application commands.");
+      console.log(
+        `✅ Successfully registered ${commands.length} application (/) commands.`
+      );
     } catch (error) {
       console.error(error);
     }
