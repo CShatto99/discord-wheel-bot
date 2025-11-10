@@ -5,4 +5,5 @@ export enum Commands {
   Reset = "reset",
   Remove = "remove",
   Shuffle = "shuffle",
+  Help = "help",
 }

@@ -1,7 +1,49 @@
-import { Events, Interaction } from "discord.js";
+import { EmbedBuilder, Events, Interaction } from "discord.js";
 import { BotClient } from "../@types";
 import { Commands } from "../constants";
 import shuffle from "./shuffle";
+
+type CommandHelp = {
+  name: string;
+  description: string;
+  usage?: string;
+  example?: string;
+};
+
+const commandHelps: CommandHelp[] = [
+  {
+    name: Commands.Add,
+    description: "Add one or more items to the wheel (space-separated).",
+    usage: "/add <items>",
+    example: "/add apple banana cherry",
+  },
+  {
+    name: Commands.List,
+    description: "Show all current items.",
+    usage: "/list",
+  },
+  {
+    name: Commands.Spin,
+    description: "Spin the wheel and remove the selected item.",
+    usage: "/spin",
+  },
+  {
+    name: Commands.Reset,
+    description: "Reset the wheel, removing all items.",
+    usage: "/reset",
+  },
+  {
+    name: Commands.Remove,
+    description: "Remove an item from the wheel by name.",
+    usage: "/remove <item>",
+    example: "/remove banana",
+  },
+  {
+    name: Commands.Shuffle,
+    description: "Shuffle all items in the wheel randomly.",
+    usage: "/shuffle",
+  },
+];
 
 /**
  * Sets up an event handler for handling Discord interactions.
@@ -85,6 +127,44 @@ export default function createInteractions(client: BotClient) {
       } else {
         shuffle(items);
         await interaction.reply("🔀 The wheel items have been shuffled!");
+      }
+    }
+
+    if (command === Commands.Help) {
+      const commandName = interaction.options.getString("command");
+
+      if (commandName) {
+        const cmd = commandHelps.find(
+          (c) => c.name.toLowerCase() === commandName.toLowerCase()
+        );
+        if (!cmd) {
+          await interaction.reply(`❌ Command "${commandName}" not found.`);
+          return;
+        }
+
+        const embed = new EmbedBuilder()
+          .setTitle(`Help: /${cmd.name}`)
+          .setDescription(cmd.description)
+          .addFields(
+            { name: "Usage", value: `\`${cmd.usage}\`` },
+            { name: "Example", value: `\`${cmd.example}\`` }
+          )
+          .setColor(0x00ffff);
+
+        await interaction.reply({ embeds: [embed] });
+      } else {
+        const embed = new EmbedBuilder()
+          .setTitle("🎡 Wheel Bot Commands")
+          .setDescription(
+            "Use `/help <command>` to get more info about a specific command."
+          )
+          .setColor(0x00ffff);
+
+        commandHelps.forEach((c) => {
+          embed.addFields({ name: `/${c.name}`, value: c.description });
+        });
+
+        await interaction.reply({ embeds: [embed] });
       }
     }
   });

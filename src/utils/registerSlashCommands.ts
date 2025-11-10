@@ -41,6 +41,18 @@ export default async function registerSlashCommands() {
     new SlashCommandBuilder()
       .setName(Commands.Shuffle)
       .setDescription("Shuffle all items in the wheel randomly."),
+
+    new SlashCommandBuilder()
+      .setName("help")
+      .setDescription(
+        "Show a list of all commands or details for a specific command."
+      )
+      .addStringOption((option) =>
+        option
+          .setName("command")
+          .setDescription("Get help for a specific command")
+          .setRequired(false)
+      ),
   ].map((command) => command.toJSON());
 
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
