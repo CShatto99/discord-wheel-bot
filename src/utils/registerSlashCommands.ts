@@ -43,7 +43,7 @@ export default async function registerSlashCommands() {
       .setDescription("Shuffle all items in the wheel randomly."),
 
     new SlashCommandBuilder()
-      .setName("help")
+      .setName(Commands.Help)
       .setDescription(
         "Show a list of all commands or details for a specific command."
       )
