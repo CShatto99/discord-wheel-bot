@@ -62,7 +62,6 @@ export default async function registerSlashCommands() {
       console.log(
         `⏳ Refreshing ${commands.length} application (/) commands...`
       );
-
       const route =
         process.env.NODE_ENV !== "production"
           ? Routes.applicationGuildCommands(
