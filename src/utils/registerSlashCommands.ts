@@ -63,13 +63,15 @@ export default async function registerSlashCommands() {
         `⏳ Refreshing ${commands.length} application (/) commands...`
       );
 
-      await rest.put(
-        Routes.applicationGuildCommands(
-          process.env.CLIENT_ID!,
-          process.env.GUILD_ID!
-        ),
-        { body: commands }
-      );
+      const route =
+        process.env.NODE_ENV !== "production"
+          ? Routes.applicationGuildCommands(
+              process.env.CLIENT_ID!,
+              process.env.GUILD_ID!
+            )
+          : Routes.applicationCommands(process.env.CLIENT_ID!);
+
+      await rest.put(route);
 
       console.log(
         `✅ Successfully registered ${commands.length} application (/) commands.`
