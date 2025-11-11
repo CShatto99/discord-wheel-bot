@@ -1,7 +1,7 @@
 {
   "name": "discord-wheel-bot",
   "version": "1.0.0",
-  "description": "A Discord bot that manages a spin-the-wheel list for random selection, built with TypeScript and discord.js.",
+  "description": "A fun Discord bot that replicates the basic features of Wheel of Names. Add entries, spin the wheel, and randomly pick a winner right in your server.",
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
