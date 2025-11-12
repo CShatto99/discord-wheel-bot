@@ -11,5 +11,5 @@ export default function getGuildItems(guildId: Interaction["guildId"]) {
 	if (!itemsByGuild.has(guildId)) {
 		itemsByGuild.set(guildId, []);
 	}
-	return itemsByGuild.get(guildId)!;
+	return itemsByGuild.get(guildId) ?? [];
 }

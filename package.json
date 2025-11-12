@@ -1,32 +1,38 @@
 {
-  "name": "discord-wheel-bot",
-  "version": "1.0.0",
-  "description": "A fun Discord bot that replicates the basic features of Wheel of Names. Add entries, spin the wheel, and randomly pick a winner right in your server.",
-  "main": "index.js",
-  "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CShatto99/discord-wheel-bot.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/CShatto99/discord-wheel-bot/issues"
-  },
-  "homepage": "https://github.com/CShatto99/discord-wheel-bot#readme",
-  "dependencies": {
-    "discord.js": "^14.24.2",
-    "dotenv": "^17.2.3"
-  },
-  "devDependencies": {
-    "@types/node": "^24.10.0",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
-  }
+	"name": "discord-wheel-bot",
+	"version": "1.0.0",
+	"description": "A fun Discord bot that replicates the basic features of Wheel of Names. Add entries, spin the wheel, and randomly pick a winner right in your server.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node dist/index.js",
+		"build": "tsc",
+		"dev": "tsx watch src/index.ts",
+		"lint": "npx @biomejs/biome check --write",
+		"typecheck": "tsc --noEmit",
+		"prepare": "husky"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CShatto99/discord-wheel-bot.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"bugs": {
+		"url": "https://github.com/CShatto99/discord-wheel-bot/issues"
+	},
+	"homepage": "https://github.com/CShatto99/discord-wheel-bot#readme",
+	"dependencies": {
+		"discord.js": "^14.24.2",
+		"dotenv": "^17.2.3",
+		"env-var": "^7.5.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.5",
+		"@types/node": "^24.10.0",
+		"husky": "^9.1.7",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3"
+	}
 }
