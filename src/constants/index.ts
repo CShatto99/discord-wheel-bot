@@ -7,3 +7,5 @@ export enum Commands {
   Shuffle = "shuffle",
   Help = "help",
 }
+
+export const EMBED_COLOR = 0x5865f2;

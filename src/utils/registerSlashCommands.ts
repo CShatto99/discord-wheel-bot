@@ -1,82 +1,59 @@
-import { REST, Routes, SlashCommandBuilder } from "discord.js";
-import { Commands } from "../constants";
+import {
+  REST,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  Routes,
+} from "discord.js";
+import fs from "fs";
+import path from "path";
+import { pathToFileURL } from "url";
+import { Command } from "../@types";
 
 /**
- * Registers and updates Discord slash commands for the bot.
+ * Registers or updates Discord slash commands for the bot.
  */
 export default async function registerSlashCommands() {
-  const commands = [
-    new SlashCommandBuilder()
-      .setName(Commands.Add)
-      .setDescription("Add one or more items to the wheel (space-separated)")
-      .addStringOption((option) =>
-        option
-          .setName("items")
-          .setDescription("Items to add (separate with spaces)")
-          .setRequired(true)
-      ),
+  const rest = new REST().setToken(process.env.DISCORD_TOKEN!);
+  const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+  const importPromises: Promise<Command>[] = [];
+  const commandsPath = path.join(__dirname, "..", "commands");
+  const commandsFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file: string) =>
+      file.endsWith(process.env.NODE_ENV === "production" ? ".js" : ".ts")
+    );
 
-    new SlashCommandBuilder()
-      .setName(Commands.List)
-      .setDescription("Show all current items"),
+  commandsFiles.forEach(async (file) => {
+    const filePath = path.join(commandsPath, file);
+    importPromises.push(import(pathToFileURL(filePath).href));
+  });
 
-    new SlashCommandBuilder()
-      .setName(Commands.Spin)
-      .setDescription("Spin the wheel and remove the selected item"),
+  const importedCommands = await Promise.all(importPromises);
+  importedCommands.forEach((file) => {
+    commands.push(file.default.data.toJSON());
+  });
 
-    new SlashCommandBuilder()
-      .setName(Commands.Reset)
-      .setDescription("Reset the wheel"),
+  try {
+    console.log(
+      `Started refreshing ${commands.length} application (/) commands.`
+    );
 
-    new SlashCommandBuilder()
-      .setName(Commands.Remove)
-      .setDescription("Remove an item from the wheel by name.")
-      .addStringOption((option) =>
-        option
-          .setName("item")
-          .setDescription("The name of the item you want to remove.")
-          .setRequired(true)
-      ),
+    const route =
+      process.env.NODE_ENV === "production"
+        ? Routes.applicationCommands(process.env.CLIENT_ID!)
+        : Routes.applicationGuildCommands(
+            process.env.CLIENT_ID!,
+            process.env.GUILD_ID!
+          );
 
-    new SlashCommandBuilder()
-      .setName(Commands.Shuffle)
-      .setDescription("Shuffle all items in the wheel randomly."),
+    // The put method is used to fully refresh all commands in the guild with the current set
+    const data = (await rest.put(route, { body: commands })) as {
+      length: number;
+    };
 
-    new SlashCommandBuilder()
-      .setName(Commands.Help)
-      .setDescription(
-        "Show a list of all commands or details for a specific command."
-      )
-      .addStringOption((option) =>
-        option
-          .setName("command")
-          .setDescription("Get help for a specific command")
-          .setRequired(false)
-      ),
-  ].map((command) => command.toJSON());
-
-  const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
-
-  (async () => {
-    try {
-      console.log(
-        `⏳ Refreshing ${commands.length} application (/) commands...`
-      );
-      const route =
-        process.env.NODE_ENV !== "production"
-          ? Routes.applicationGuildCommands(
-              process.env.CLIENT_ID!,
-              process.env.GUILD_ID!
-            )
-          : Routes.applicationCommands(process.env.CLIENT_ID!);
-
-      await rest.put(route);
-
-      console.log(
-        `✅ Successfully registered ${commands.length} application (/) commands.`
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  })();
+    console.log(
+      `Successfully reloaded ${data.length} application (/) commands.`
+    );
+  } catch (error) {
+    console.error(error);
+  }
 }
