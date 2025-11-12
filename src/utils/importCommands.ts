@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { Collection } from "discord.js";
-import type { BotClient, Command } from "../@types";
+import type { BotClient } from "../@types";
 import { env } from "../config/env";
 
 /**
