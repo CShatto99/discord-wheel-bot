@@ -6,7 +6,6 @@ import {
 import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
-import { Command } from "../@types";
 
 /**
  * Registers or updates Discord slash commands for the bot.
@@ -14,7 +13,6 @@ import { Command } from "../@types";
 export default async function registerSlashCommands() {
   const rest = new REST().setToken(process.env.DISCORD_TOKEN!);
   const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-  const importPromises: Promise<Command>[] = [];
   const commandsPath = path.join(__dirname, "..", "commands");
   const commandsFiles = fs
     .readdirSync(commandsPath)
@@ -22,18 +20,20 @@ export default async function registerSlashCommands() {
       file.endsWith(process.env.NODE_ENV === "production" ? ".js" : ".ts")
     );
 
-  commandsFiles.forEach(async (file) => {
-    const filePath =
-      process.env.NODE_ENV === "production"
-        ? path.join(commandsPath, file)
-        : pathToFileURL(path.join(commandsPath, file)).href;
-    importPromises.push(import(filePath));
-  });
+  for (const file of commandsFiles) {
+    const filePath = path.join(commandsPath, file);
+    const fileUrl = pathToFileURL(filePath).href;
+    const imported = await import(fileUrl);
 
-  const importedCommands = await Promise.all(importPromises);
-  importedCommands.forEach((file) => {
-    commands.push(file.default.data.toJSON());
-  });
+    if (!imported?.default?.data || !imported.default.execute) {
+      console.warn(
+        `[WARNING] The command at ${file} is missing "data" or "execute".`
+      );
+      continue;
+    }
+
+    commands.push(imported.default.data.toJSON());
+  }
 
   try {
     console.log(
