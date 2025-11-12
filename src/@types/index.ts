@@ -1,24 +1,24 @@
-import {
-  ChatInputCommandInteraction,
-  Client,
-  Collection,
-  InteractionResponse,
-  SlashCommandOptionsOnlyBuilder,
+import type {
+	ChatInputCommandInteraction,
+	Client,
+	Collection,
+	InteractionResponse,
+	SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
 
 export type BotClient = Client & {
-  commands: Collection<unknown, unknown>;
+	commands: Collection<unknown, unknown>;
 };
 
 export type Interaction = ChatInputCommandInteraction & {
-  guildId: string;
+	guildId: string;
 };
 
 export type Command = {
-  default: {
-    data: SlashCommandOptionsOnlyBuilder;
-    execute(
-      interaction: ChatInputCommandInteraction
-    ): Promise<InteractionResponse<boolean> | undefined | void>;
-  };
+	default: {
+		data: SlashCommandOptionsOnlyBuilder;
+		execute(
+			interaction: ChatInputCommandInteraction,
+		): Promise<InteractionResponse<boolean> | undefined | void>;
+	};
 };

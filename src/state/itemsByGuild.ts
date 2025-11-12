@@ -1,4 +1,4 @@
-import { Interaction } from "../@types";
+import type { Interaction } from "../@types";
 
 /**
  * Keeps track of items per guild during runtime.
@@ -8,8 +8,8 @@ import { Interaction } from "../@types";
 export const itemsByGuild = new Map<string, string[]>();
 
 export default function getGuildItems(guildId: Interaction["guildId"]) {
-  if (!itemsByGuild.has(guildId)) {
-    itemsByGuild.set(guildId, []);
-  }
-  return itemsByGuild.get(guildId)!;
+	if (!itemsByGuild.has(guildId)) {
+		itemsByGuild.set(guildId, []);
+	}
+	return itemsByGuild.get(guildId)!;
 }
