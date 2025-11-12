@@ -1,12 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import { pathToFileURL } from "node:url";
 import {
   REST,
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
 } from "discord.js";
-import type { Command } from "../@types";
 import { env } from "../config/env";
 
 /**

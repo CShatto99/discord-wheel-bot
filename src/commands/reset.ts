@@ -4,17 +4,17 @@ import { Commands } from "../constants";
 import { itemsByGuild } from "../state/itemsByGuild";
 
 const reset: Command = {
-  data: new SlashCommandBuilder()
-    .setName(Commands.Reset)
-    .setDescription("Reset the wheel"),
-  async execute(interaction: Interaction) {
-    if (itemsByGuild.has(interaction.guildId)) {
-      itemsByGuild.delete(interaction.guildId);
-      return interaction.reply("🔄 The wheel has been reset.");
-    }
+	data: new SlashCommandBuilder()
+		.setName(Commands.Reset)
+		.setDescription("Reset the wheel"),
+	async execute(interaction: Interaction) {
+		if (itemsByGuild.has(interaction.guildId)) {
+			itemsByGuild.delete(interaction.guildId);
+			return interaction.reply("🔄 The wheel has been reset.");
+		}
 
-    await interaction.reply("ℹ️ There was no active wheel to reset.");
-  },
+		await interaction.reply("ℹ️ There was no active wheel to reset.");
+	},
 };
 
 export default reset;
