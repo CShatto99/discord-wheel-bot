@@ -18,8 +18,12 @@ export default function importCommands(client: BotClient) {
     );
 
   commandsFiles.forEach(async (file) => {
-    const filePath = path.join(commandsPath, file);
-    const command: Command = await import(pathToFileURL(filePath).href);
+    const filePath =
+      process.env.NODE_ENV === "production"
+        ? path.join(commandsPath, file)
+        : pathToFileURL(path.join(commandsPath, file)).href;
+
+    const command: Command = await import(filePath);
 
     // Set a new item in the Collection with the key as the command name and the value as the exported module
     if ("data" in command.default && "execute" in command.default) {

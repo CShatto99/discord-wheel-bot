@@ -23,8 +23,11 @@ export default async function registerSlashCommands() {
     );
 
   commandsFiles.forEach(async (file) => {
-    const filePath = path.join(commandsPath, file);
-    importPromises.push(import(pathToFileURL(filePath).href));
+    const filePath =
+      process.env.NODE_ENV === "production"
+        ? path.join(commandsPath, file)
+        : pathToFileURL(path.join(commandsPath, file)).href;
+    importPromises.push(import(filePath));
   });
 
   const importedCommands = await Promise.all(importPromises);
