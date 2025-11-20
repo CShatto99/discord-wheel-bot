@@ -3,55 +3,87 @@ import type { Command, Interaction } from "../@types";
 import { Commands, MAX_ITEMS_PER_GUILD } from "../constants";
 import getGuildItems, { itemsByGuild } from "../state/itemsByGuild";
 
+const MAX_ITEM_LENGTH = 20;
+
 const add: Command = {
-	data: new SlashCommandBuilder()
-		.setName(Commands.Add)
-		.setDescription("Add one or more items to the wheel (space-separated)")
-		.addStringOption((option) =>
-			option
-				.setName("items")
-				.setDescription("Items to add (separate with spaces)")
-				.setRequired(true),
-		),
-	async execute(interaction: Interaction) {
-		const items = getGuildItems(interaction.guildId);
+  data: new SlashCommandBuilder()
+    .setName(Commands.Add)
+    .setDescription("Add one or more items to the wheel (space-separated)")
+    .addStringOption((option) =>
+      option
+        .setName("items")
+        .setDescription("Items to add (separate with spaces)")
+        .setRequired(true)
+    ),
+  async execute(interaction: Interaction) {
+    const items = getGuildItems(interaction.guildId);
+    const itemsInput = interaction.options.getString("items", true);
 
-		const itemsInput = interaction.options.getString("items", true);
+    const parsedItems = itemsInput
+      .split(/\s+/)
+      .map((i) => i.trim())
+      .filter(Boolean);
 
-		const newItems = itemsInput
-			.split(/\s+/)
-			.map((i) => i.trim())
-			.filter(Boolean)
-			.filter((i) => !items.includes(i));
+    if (parsedItems.length === 0) {
+      return interaction.reply("❗ No valid items provided!");
+    }
 
-		if (newItems.length === 0) {
-			return interaction.reply("❗ None of these items are new or valid!");
-		}
+    const tooLongItems = parsedItems.filter((i) => i.length > MAX_ITEM_LENGTH);
+    const validLengthItems = parsedItems.filter(
+      (i) => i.length <= MAX_ITEM_LENGTH
+    );
 
-		const availableSlots = MAX_ITEMS_PER_GUILD - items.length;
+    if (validLengthItems.length === 0) {
+      return interaction.reply(
+        `🚫 All items were too long! Max length is **${MAX_ITEM_LENGTH}** characters.\n❌ Invalid: **${tooLongItems.join(
+          ", "
+        )}**`
+      );
+    }
 
-		if (availableSlots <= 0) {
-			return interaction.reply(
-				`🚫 You already have ${MAX_ITEMS_PER_GUILD} items. Remove some first before adding more.`,
-			);
-		}
+    const availableSlots = MAX_ITEMS_PER_GUILD - items.length;
 
-		const itemsToAdd = newItems.slice(0, availableSlots);
-		const rejectedItems = newItems.slice(availableSlots);
+    if (availableSlots <= 0) {
+      return interaction.reply(
+        `🚫 You already have ${MAX_ITEMS_PER_GUILD} items. Remove some first before adding more.`
+      );
+    }
 
-		items.push(...itemsToAdd);
-		itemsByGuild.set(interaction.guildId, items);
+    const itemsToAdd = validLengthItems.slice(0, availableSlots);
 
-		let message = `✅ Added: **${itemsToAdd.join(", ")}**`;
+    const rejectedItems = [
+      ...validLengthItems.slice(availableSlots),
+      ...tooLongItems,
+    ];
 
-		if (rejectedItems.length > 0) {
-			message += `\n⚠️ The following couldn't be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}: **${rejectedItems.join(
-				", ",
-			)}**`;
-		}
+    // Update state
+    items.push(...itemsToAdd);
+    itemsByGuild.set(interaction.guildId, items);
 
-		await interaction.reply(message);
-	},
+    items.push(...itemsToAdd);
+    itemsByGuild.set(interaction.guildId, items);
+
+    let message = `✅ Added: **${itemsToAdd.join(", ")}**\n`;
+
+    if (rejectedItems.length > 0) {
+      const tooLong = tooLongItems.length
+        ? `\n⚠️ The following were too long (max ${MAX_ITEM_LENGTH} chars): **${tooLongItems.join(
+            ", "
+          )}**`
+        : "";
+
+      const tooMany =
+        validLengthItems.length > itemsToAdd.length
+          ? `\n⚠️ These couldn't be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}: **${validLengthItems
+              .slice(availableSlots)
+              .join(", ")}**`
+          : "";
+
+      message += tooLong + tooMany;
+    }
+
+    await interaction.reply(message);
+  },
 };
 
 export default add;
