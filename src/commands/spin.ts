@@ -9,8 +9,8 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const spin: Command = {
   data: new SlashCommandBuilder()
-    .setName(Commands.Spin)
-    .setDescription("Spin the wheel and remove the selected item")
+    .setName(Commands.Spin.name)
+    .setDescription(Commands.Spin.description)
     .addIntegerOption((option) =>
       option
         .setName("count")
@@ -22,7 +22,7 @@ const spin: Command = {
     const items = getGuildItems(interaction.guildId);
     if (items.length === 0) {
       return interaction.reply(
-        `There's nothing to spin! Add items first with \`/${Commands.Add}\`.`
+        `There's nothing to spin! Add items first with \`/${Commands.Add.name}\`.`
       );
     }
 
