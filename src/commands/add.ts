@@ -68,15 +68,13 @@ const add: Command = {
       embeds.push(embed);
     }
 
-    if (itemsToAdd.length > 0) {
-      const itemWord = itemsToAdd.length === 1 ? "item" : "items";
-      message = `✅ Added ${itemsToAdd.length} ${itemWord}.`;
-    }
-
     if (rejectedCount > 0) {
       if (tooLongItems.length > 0) {
-        const itemWord = tooLongItems.length === 1 ? "item" : "items";
-        message += `⚠️ ${tooLongItems.length} ${itemWord} were too long and were not added.\n`;
+        if (tooLongItems.length === 1) {
+          message += `⚠️ ${tooLongItems.length} item was too long and was not added.\n`;
+        } else {
+          message += `⚠️ ${tooLongItems.length} items were too long and were not added.\n`;
+        }
       }
       if (validLengthItems.length > itemsToAdd.length) {
         const itemWord =

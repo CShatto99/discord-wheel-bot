@@ -3,6 +3,7 @@ import type { Command, Interaction } from "../@types";
 import { Commands, EMBED_COLOR, MAX_ITEMS_PER_GUILD } from "../constants";
 import getGuildItems, { itemsByGuild } from "../state/itemsByGuild";
 
+const MAX_ITEM_DISPLAY = 50;
 const SPIN_DELAY_MS = 2000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,13 +51,6 @@ const spin: Command = {
       const embed = new EmbedBuilder()
         .setTitle("🎡 The Wheel Has Spoken!")
         .setDescription(`**🎯 Selected:** ${selected}`)
-        .addFields({
-          name: "Remaining Items",
-          value:
-            items.length > 0
-              ? items.map((i, idx) => `**${idx + 1}.** ${i}`).join("\n")
-              : "✨ None left!",
-        })
         .setColor(EMBED_COLOR)
         .setFooter({
           text: `Total remaining: ${items.length}/${MAX_ITEMS_PER_GUILD}`,
