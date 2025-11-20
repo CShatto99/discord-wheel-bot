@@ -8,56 +8,56 @@ const SPIN_DELAY_MS = 2000;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const spin: Command = {
-  data: new SlashCommandBuilder()
-    .setName(Commands.Spin.name)
-    .setDescription(Commands.Spin.description)
-    .addIntegerOption((option) =>
-      option
-        .setName("count")
-        .setDescription("Number of times to spin the wheel")
-        .setRequired(false)
-        .setMinValue(1)
-    ),
-  async execute(interaction: Interaction) {
-    const items = getGuildItems(interaction.guildId);
-    if (items.length === 0) {
-      return interaction.reply(
-        `There's nothing to spin! Add items first with \`/${Commands.Add.name}\`.`
-      );
-    }
+	data: new SlashCommandBuilder()
+		.setName(Commands.Spin.name)
+		.setDescription(Commands.Spin.description)
+		.addIntegerOption((option) =>
+			option
+				.setName("count")
+				.setDescription("Number of times to spin the wheel")
+				.setRequired(false)
+				.setMinValue(1),
+		),
+	async execute(interaction: Interaction) {
+		const items = getGuildItems(interaction.guildId);
+		if (items.length === 0) {
+			return interaction.reply(
+				`There's nothing to spin! Add items first with \`/${Commands.Add.name}\`.`,
+			);
+		}
 
-    const spinCount = Math.min(
-      interaction.options.getInteger("count") ?? 1,
-      items.length
-    );
+		const spinCount = Math.min(
+			interaction.options.getInteger("count") ?? 1,
+			items.length,
+		);
 
-    await interaction.reply(
-      spinCount > 1
-        ? `🎡 Spinning the wheel ${spinCount} times...`
-        : `🎡 Spinning the wheel...`
-    );
+		await interaction.reply(
+			spinCount > 1
+				? `🎡 Spinning the wheel ${spinCount} times...`
+				: `🎡 Spinning the wheel...`,
+		);
 
-    for (let i = 0; i < spinCount && items.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * items.length);
-      const selected = items.splice(randomIndex, 1)[0];
+		for (let i = 0; i < spinCount && items.length > 0; i++) {
+			const randomIndex = Math.floor(Math.random() * items.length);
+			const selected = items.splice(randomIndex, 1)[0];
 
-      itemsByGuild.set(interaction.guildId, items);
+			itemsByGuild.set(interaction.guildId, items);
 
-      // Wait 2 seconds for suspense
-      await sleep(SPIN_DELAY_MS);
+			// Wait 2 seconds for suspense
+			await sleep(SPIN_DELAY_MS);
 
-      // Update embed with current spin
-      const embed = new EmbedBuilder()
-        .setTitle("🎡 The Wheel Has Spoken!")
-        .setDescription(`**🎯 Selected:** ${selected}`)
-        .setColor(EMBED_COLOR)
-        .setFooter({
-          text: `Total remaining: ${items.length}/${MAX_ITEMS_PER_GUILD}`,
-        });
+			// Update embed with current spin
+			const embed = new EmbedBuilder()
+				.setTitle("🎡 The Wheel Has Spoken!")
+				.setDescription(`**🎯 Selected:** ${selected}`)
+				.setColor(EMBED_COLOR)
+				.setFooter({
+					text: `Total remaining: ${items.length}/${MAX_ITEMS_PER_GUILD}`,
+				});
 
-      await interaction.followUp({ embeds: [embed] });
-    }
-  },
+			await interaction.followUp({ embeds: [embed] });
+		}
+	},
 };
 
 export default spin;
