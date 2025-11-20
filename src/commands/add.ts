@@ -51,15 +51,29 @@ const add: Command = {
     items.push(...itemsToAdd);
     itemsByGuild.set(interaction.guildId, items);
 
-    let message = `✅ Added: **${itemsToAdd.join(", ")}**`;
+    let message = "";
+
+    if (itemsToAdd.length > 0) {
+      const itemWord = itemsToAdd.length === 1 ? "item" : "items";
+      message = `✅ Added ${itemsToAdd.length} ${itemWord}.`;
+    }
+
     if (rejectedCount > 0) {
       if (tooLongItems.length > 0) {
-        message += `\n⚠️ ${tooLongItems.length} item(s) were too long and were not added.`;
+        const itemWord = tooLongItems.length === 1 ? "item" : "items";
+        message +=
+          (message ? "\n" : "") +
+          `⚠️ ${tooLongItems.length} ${itemWord} were too long and were not added.`;
       }
+
       if (validLengthItems.length > itemsToAdd.length) {
-        message += `\n⚠️ ${
-          validLengthItems.length - itemsToAdd.length
-        } item(s) could not be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}.`;
+        const itemWord =
+          validLengthItems.length - itemsToAdd.length === 1 ? "item" : "items";
+        message +=
+          (message ? "\n" : "") +
+          `⚠️ ${
+            validLengthItems.length - itemsToAdd.length
+          } ${itemWord} could not be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}.`;
       }
     }
 
