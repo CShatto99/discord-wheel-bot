@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import type { Command, Interaction } from "../@types";
-import { Commands, MAX_ITEMS_PER_GUILD } from "../constants";
+import { Commands, EMBED_COLOR, MAX_ITEMS_PER_GUILD } from "../constants";
 import getGuildItems, { itemsByGuild } from "../state/itemsByGuild";
 
 const MAX_ITEM_LENGTH = 20;
@@ -51,7 +51,22 @@ const add: Command = {
     items.push(...itemsToAdd);
     itemsByGuild.set(interaction.guildId, items);
 
+    const embeds = [];
     let message = "";
+
+    if (itemsToAdd.length > 0) {
+      const itemWord = itemsToAdd.length === 1 ? "item" : "items";
+      const embed = new EmbedBuilder()
+        .setTitle(`✅ Added ${itemsToAdd.length} ${itemWord}`)
+        .setDescription(
+          itemsToAdd.map((i, idx) => `**${idx + 1}.** ${i}`).join("\n")
+        )
+        .setColor(EMBED_COLOR)
+        .setFooter({
+          text: `Total items: ${items.length}/${MAX_ITEMS_PER_GUILD}`,
+        });
+      embeds.push(embed);
+    }
 
     if (itemsToAdd.length > 0) {
       const itemWord = itemsToAdd.length === 1 ? "item" : "items";
@@ -61,23 +76,18 @@ const add: Command = {
     if (rejectedCount > 0) {
       if (tooLongItems.length > 0) {
         const itemWord = tooLongItems.length === 1 ? "item" : "items";
-        message +=
-          (message ? "\n" : "") +
-          `⚠️ ${tooLongItems.length} ${itemWord} were too long and were not added.`;
+        message += `⚠️ ${tooLongItems.length} ${itemWord} were too long and were not added.\n`;
       }
-
       if (validLengthItems.length > itemsToAdd.length) {
         const itemWord =
           validLengthItems.length - itemsToAdd.length === 1 ? "item" : "items";
-        message +=
-          (message ? "\n" : "") +
-          `⚠️ ${
-            validLengthItems.length - itemsToAdd.length
-          } ${itemWord} could not be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}.`;
+        message += `⚠️ ${
+          validLengthItems.length - itemsToAdd.length
+        } ${itemWord} could not be added because the wheel reached its limit of ${MAX_ITEMS_PER_GUILD}.\n`;
       }
     }
 
-    await interaction.reply(message);
+    await interaction.reply({ content: message || undefined, embeds });
   },
 };
 
