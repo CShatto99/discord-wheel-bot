@@ -3,7 +3,6 @@ import type { Command, Interaction } from "../@types";
 import { Commands, EMBED_COLOR, MAX_ITEMS_PER_GUILD } from "../constants";
 import getGuildItems, { itemsByGuild } from "../state/itemsByGuild";
 
-const MAX_ITEM_DISPLAY = 50;
 const SPIN_DELAY_MS = 2000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
